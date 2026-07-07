@@ -8,8 +8,8 @@ namespace WorldRank.Models
 {
     public class InMemoryWalletRepository: IWalletRepository
     {
-        private Dictionary<int, Dictionary<CurrencyTypes, Wallet>> _allWallets = 
-            new Dictionary<int, Dictionary<CurrencyTypes, Wallet>>();
+        private Dictionary<int, Dictionary<CurrencyTypes, Wallet>> _allWallets =  new (); //No need for custom constructor code snippet, we can rely on the default constructor
+
         public void Add(Wallet wallet, int playerId)
         {
             if (wallet == null) throw new ArgumentNullException(nameof(wallet));
@@ -30,9 +30,12 @@ namespace WorldRank.Models
 
         public Dictionary<CurrencyTypes, Wallet> GetByPlayer(int playerId)
         {
-
-
-            return new Dictionary<CurrencyTypes, Wallet>();
+           if (_allWallets.TryGetValue(playerId, out var playerWallets))
+    {
+        return playerWallets;
+    }
+    //empty dict in case of no wallet entity assigned to the player
+    return new Dictionary<CurrencyTypes, Wallet>();
         }
     }
 }

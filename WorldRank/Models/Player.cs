@@ -6,6 +6,9 @@ public class Player: IPlayer
     public int Id {get;}
     public string Name {get; private set;}
     public int Score {get; private set;}
+    
+
+
 
     // Constructor
     public Player(string name)
