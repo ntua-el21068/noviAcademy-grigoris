@@ -11,7 +11,9 @@ while (true)
     Console.WriteLine("3. Find by name");
     Console.WriteLine("4. Add Wallet to player");
     Console.WriteLine("5. Get Wallets by player");
-    Console.WriteLine("6. Exit");
+    Console.WriteLine("6. Add Score to Player");
+    Console.WriteLine("7. Group Players by Score");
+    Console.WriteLine("8. Exit");
     Console.Write("Choose an option (type and eneter corresponding number): ");
 
     string? choice = Console.ReadLine();
@@ -164,10 +166,80 @@ while (true)
         }
 
         case "6":
+            {
+                Console.WriteLine("Enter Player ID to add score to: ");
+                string? input = Console.ReadLine();
+                if (int.TryParse(input, out int playerId))
+            {
+        
+                Player? foundPlayer = players.FindPlayer(playerId);
+        
+                if (foundPlayer == null)
+                {
+                    Console.WriteLine("\nPlayer does not exist.");
+                    break;
+                }
+
+                Console.WriteLine("Enter Score to add: ");
+                string? score_input = Console.ReadLine();
+                if(int.TryParse(score_input, out int score))
+                    {
+                        if (score<=0)
+                        {
+                            Console.WriteLine("\nInvalid input. Score to be added must be greater than zero.");
+                            break;
+                        }
+                        foundPlayer.AddScore(score);
+                        Console.WriteLine($"{score} points succesfully added to {foundPlayer.Name}.");
+                    }
+                    else
+                    {
+                        Console.WriteLine("\nInvalid input. Please enter a numeric socre.");
+                    }
+
+            }
+            else
+            {
+                Console.WriteLine("\nInvalid input. Please enter a numeric ID.");
+            }
+            break;
+
+            }
+
+        case "7":
+            {
+                if (players.CountPlayers() == 0)
+                {
+                    Console.WriteLine("No players in memory");
+                    break;
+                }
+                Console.WriteLine("--- Players Grouped by Score ---");
+                IEnumerable<IGrouping<int, Player>> groupedPlayers = players.GroupPlayersByScore;
+                
+                foreach (var group in groupedPlayers)
+                {
+                    Console.WriteLine($"Score: {group.Key}");
+
+                    foreach(var player in group)
+                    {
+                        Console.WriteLine($"-{player.Name}");
+                    }
+                    Console.WriteLine();
+                }
+
+                break;
+
+            }
+
+
+ 
+
+
+        case "8":
             return;
 
         default:
-            Console.WriteLine("Invalid choice. Please enter one of the available options 1-4.");
+            Console.WriteLine("Invalid choice. Please enter one of the available options 1-8.");
             break;
     }
 }
