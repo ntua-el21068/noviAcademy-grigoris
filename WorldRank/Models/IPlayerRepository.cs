@@ -12,7 +12,7 @@ namespace WorldRank.Models
         Player AddPlayer(Player p);
         Player? FindPlayer(int playerId);
         void DeletePlayer(int playerId);
-        IEnumerable<IGrouping<int, Player>> GroupPlayersByScore {get;}
+        IEnumerable<IGrouping<int, Player>> GroupPlayersByScore();
         
     }
 }

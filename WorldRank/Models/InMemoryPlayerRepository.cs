@@ -32,9 +32,8 @@ namespace WorldRank.Models
                 throw new KeyNotFoundException($"Player {playerId} does not exist.");
             }
         }
-        public IEnumerable<IGrouping<int, Player>> GroupPlayersByScore
-        {
-            get
+        public IEnumerable<IGrouping<int, Player>> GroupPlayersByScore()
+        {  
             {
                 if(_allPlayers == null){
                 throw new NullReferenceException(nameof(_allPlayers));

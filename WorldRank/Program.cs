@@ -214,7 +214,7 @@ while (true)
                     break;
                 }
                 Console.WriteLine("--- Players Grouped by Score ---");
-                IEnumerable<IGrouping<int, Player>> groupedPlayers = players.GroupPlayersByScore;
+                IEnumerable<IGrouping<int, Player>> groupedPlayers = players.GroupPlayersByScore();
                 
                 foreach (var group in groupedPlayers)
                 {
