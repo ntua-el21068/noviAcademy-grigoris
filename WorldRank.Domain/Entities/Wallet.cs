@@ -69,7 +69,7 @@ namespace WorldRank.Domain
 
 			var newBalance = Balance - amount;
 			if (newBalance < 0)
-				Console.WriteLine("Subtraction forced led to negative balance");
+				Console.WriteLine($"Subtraction forced led to negative balance {newBalance}");
 
 			Balance = newBalance;
 		}
