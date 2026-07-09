@@ -2,6 +2,7 @@ using NLog;
 using WorldRank.Domain.Enums;
 using WorldRank.Domain.Exceptions;
 using WorldRank.Domain;
+using WorldRank.Application;
 
 namespace WorldRank.Console
 {
