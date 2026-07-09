@@ -1,5 +1,5 @@
 using NLog;
-using WorldRank.Console;
+using WorldRank.Infrastructure;
 using WorldRank.Application;
 using WorldRank.Domain;
 using WorldRank.Domain.Enums;
