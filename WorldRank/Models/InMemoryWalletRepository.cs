@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WorldRank.Exceptions;
 
 namespace WorldRank.Models
 {
@@ -22,7 +23,7 @@ namespace WorldRank.Models
 
             if (playerWallets.ContainsKey(wallet.Currency))
             {
-                throw new InvalidOperationException("You can only have one wallet for each currency.");
+                throw new DuplicateWalletException(playerId, wallet.Currency);
             }
 
             playerWallets.Add(wallet.Currency, wallet);

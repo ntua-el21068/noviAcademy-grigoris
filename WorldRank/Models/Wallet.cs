@@ -1,4 +1,8 @@
+using System;
+using WorldRank.Exceptions;
+
 namespace WorldRank.Models;
+
 
 public class Wallet
 {
@@ -33,6 +37,12 @@ public class Wallet
         {
             throw new ArgumentException("Deposit amount must be positive");
         }
+
+        if(decimal.Round(amount, 2) != amount)
+        {
+            throw new InvalidCurrencyPrecisionException(amount);
+        }
+
         Balance += amount;
     }
 
@@ -42,10 +52,15 @@ public class Wallet
         {
             throw new ArgumentException("Withdraw amount must be positive");
         }
+
+        if(decimal.Round(amount, 2) != amount)
+        {
+            throw new InvalidCurrencyPrecisionException(amount);
+        }
         // Negative Balance is not allowed, this is the only method that could lead to such a scenario
         if (Balance - amount < 0)
         {
-            throw new InvalidOperationException($"Insufficient funds. Your current balance is: {Balance}.\nBalance cannot go negative");
+            throw new InsufficientFundsException(Id);
         }
 
         Balance -= amount;

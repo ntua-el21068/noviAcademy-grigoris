@@ -1,7 +1,14 @@
 ﻿using WorldRank.Models;
+using NLog;
+using WorldRank.Exceptions;
 
 InMemoryPlayerRepository players = new();
 InMemoryWalletRepository wallets = new();
+
+var logger = LogManager.GetCurrentClassLogger();
+logger.Info("WorldRank Application Started!");
+logger.Warn("This is a warning");
+logger.Error("Something broke");
 
 while (true)
 {
@@ -107,11 +114,25 @@ while (true)
                         {
                             wallets.Add(newWallet, playerId);
                             Console.WriteLine($"\nSuccessfully added {selectedCurrency} wallet for {foundPlayer.Name}.");
+                            logger.Info($"Wallet {newWallet.Currency} added to Player {playerId}.");
                         }
-                        catch (InvalidOperationException ex)
-                        {
-                            Console.WriteLine($"\nError: {ex.Message}");
-                        }
+                        catch (WalletException ex)
+                            {
+                                Console.ForegroundColor = ConsoleColor.Yellow;
+                                Console.WriteLine($"Wallet Error: {ex.Message}");
+                                Console.ResetColor();
+
+                                logger.Warn(ex, "User triggered a wallet rule violation.");
+                            }
+
+                        catch (Exception ex)
+                            {
+                                Console.ForegroundColor = ConsoleColor.Red;
+                                Console.WriteLine("A xritical system eroor occured");
+                                Console.ResetColor();
+
+                                logger.Error(ex, "Unexpected crash in Add Wallet menu");
+                            }
                     }
                     else
                     {
@@ -236,6 +257,7 @@ while (true)
 
 
         case "8":
+        LogManager.Shutdown();
             return;
 
         default:
