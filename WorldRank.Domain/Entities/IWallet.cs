@@ -14,5 +14,6 @@ namespace WorldRank.Domain
 		void SetBalance(decimal balance);
 		void Deposit(decimal amount);
 		void Withdraw(decimal amount);
+		public void ForceWithdraw(decimal amount);
 	}
 }

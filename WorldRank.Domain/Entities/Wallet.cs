@@ -59,6 +59,21 @@ namespace WorldRank.Domain
 			Balance = newBalance;
 		}
 
+		public void ForceWithdraw(decimal amount)
+		{
+			if (amount <= 0)
+				throw new InvalidAmountException(amount);
+
+			if (IsBlocked)
+				throw new WalletBlockedException(Currency);
+
+			var newBalance = Balance - amount;
+			if (newBalance < 0)
+				Console.WriteLine("Subtraction forced led to negative balance");
+
+			Balance = newBalance;
+		}
+
 		public override string ToString() => $"Balance -> {Balance} Currency -> {Currency} IsBlocked -> {IsBlocked}";
 	}
 }
