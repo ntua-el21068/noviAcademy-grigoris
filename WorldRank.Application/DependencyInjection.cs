@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
-   using WorldRank.Application.Strategies;
+using WorldRank.Application.Services;
+using WorldRank.Application.Strategies;
 
    namespace WorldRank.Application;
 
@@ -10,6 +11,9 @@ using Microsoft.Extensions.DependencyInjection;
            services.AddSingleton<IFundsStrategy, AddFundsStrategy>();
            services.AddSingleton<IFundsStrategy, SubtractFundsStrategy>();
            services.AddSingleton<IFundsStrategy, ForceSubtractFundsStrategy>();
+           services.AddSingleton<PlayerService>();
+           services.AddSingleton<WalletService>();
+           
            return services;
        }
    }
