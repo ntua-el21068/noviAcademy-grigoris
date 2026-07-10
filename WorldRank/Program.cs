@@ -4,12 +4,23 @@ using WorldRank.Application;
 using WorldRank.Domain;
 using WorldRank.Domain.Enums;
 using WorldRank.Domain.Exceptions;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using WorldRank;
 
 var logger = LogManager.GetCurrentClassLogger();
 
-//Wallets are stored in their own repository and reference the player via PlayerId
-IWalletRepository walletRepository = new InMemoryWalletRepository();
-IPlayerRepository playerRepository = new InMemoryPlayerRepository();
+//Composition root: register every layer's services, then build the container.
+var services = new ServiceCollection();
+services.AddWorldRank();
+
+using var provider = services.BuildServiceProvider();
+
+//var playerService = provider.GetRequiredService<PlayerService>();
+//var walletService = provider.GetRequiredService<WalletService>();
+   
+var walletRepository = provider.GetRequiredService<IWalletRepository>();
+var playerRepository = provider.GetRequiredService<IPlayerRepository>();
 
 logger.Info("Application started.");
 
