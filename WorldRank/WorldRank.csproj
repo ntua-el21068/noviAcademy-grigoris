@@ -15,7 +15,7 @@
     <ProjectReference Include="../WorldRank.Application/WorldRank.Application.csproj" />
     <ProjectReference Include="../WorldRank.Domain/WorldRank.Domain.csproj" />
     <ProjectReference Include="../WorldRank.Infrastructure/WorldRank.Infrastructure.csproj" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1" />
   </ItemGroup>
 
 </Project>
