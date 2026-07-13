@@ -2,6 +2,7 @@ using Microsoft.Extensions.Logging;
 using WorldRank.Application.Interfaces;
 using WorldRank.Domain.Entities;
 using WorldRank.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 
 namespace WorldRank.Infrastructure.Repositories;
 
@@ -16,18 +17,22 @@ public class DBPlayerRepository : IPlayerRepository
         _logger = logger;
     }
 
-    public void AddPlayer(Player player)
+    public async Task AddPlayerAsync(Player player, CancellationToken cancellationToken)
     {
         _context.Players.Add(player);
-        _context.SaveChanges();
+        await _context.SaveChangesAsync(cancellationToken);
         _logger.LogInformation("Player {PlayerId} ({Name}) added with score {Score}", player.Id, player.Name, player.Score);
     }
 
-    public IEnumerable<Player> GetAllPlayers() => _context.Players.ToList();
-
-    public void DeletePlayer(int playerId)
+    public async Task<IEnumerable<Player>> GetAllPlayersAsync(CancellationToken cancellationToken)
     {
-        var player = _context.Players.SingleOrDefault(p => p.Id == playerId);
+        var players = await _context.Players.ToListAsync(cancellationToken);
+        return players;
+    }
+
+    public async Task DeletePlayerAsync(int playerId, CancellationToken cancellationToken)
+    {
+        var player = await _context.Players.SingleOrDefaultAsync(p => p.Id == playerId, cancellationToken);
         if (player is null)
         {
             _logger.LogWarning("Delete skipped: player {PlayerId} not found", playerId);
@@ -35,17 +40,25 @@ public class DBPlayerRepository : IPlayerRepository
         }
 
         _context.Players.Remove(player);
-        _context.SaveChanges();
+        await _context.SaveChangesAsync(cancellationToken);
         _logger.LogInformation("Player {PlayerId} deleted", playerId);
     }
 
-    public Player? FindPlayer(int playerId) => _context.Players.SingleOrDefault(p => p.Id == playerId);
-
-    public IEnumerable<IGrouping<int, Player>> GroupPlayersByScore()
+    public async Task<Player?> FindPlayerAsync(int playerId, CancellationToken cancellationToken)
     {
-        return _context.Players
-            .ToList()
-            .GroupBy(p => p.Score)
-            .OrderByDescending(g => g.Key);
+        var player = await _context.Players.SingleOrDefaultAsync(p => p.Id == playerId, cancellationToken);
+        if (player is null)
+        {
+            _logger.LogWarning("Find skipped: player {PlayerId} not found", playerId);
+            return null;
+        }
+        return player;
+    }
+
+    public async Task<IEnumerable<IGrouping<int, Player>>> GroupPlayersByScoreAsync(CancellationToken cancellationToken)
+    {
+        var players = await _context.Players.ToListAsync();
+        var grouped = players.GroupBy(p=>p.Score).OrderByDescending(g => g.Key);
+        return grouped;
     }
 }

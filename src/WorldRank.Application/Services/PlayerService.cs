@@ -27,6 +27,20 @@ public class PlayerService
 		return players;
 	}
 
+	public async Task<Player?> GetPlayerById(int playerId, CancellationToken cancellationToken)
+	{
+		var cacheKey = $"Player_{playerId}";
+		if(_cache.TryGetValue(cacheKey, out Player? cached) && cached is not null)
+		{
+			return cached;
+		}
+
+		var player = await _playerRepository.FindPlayerAsync(playerId, cancellationToken);
+		if(player is not null)
+		_cache.Set(cacheKey, player, TimeSpan.FromSeconds(60));
+		return player;
+	}
+
 	public async Task<Player> AddPlayer(string name, int score, CancellationToken cancellationToken)
 	{
 		var player = new Player(await(GeneratePlayerIdAsync(cancellationToken)), name);
@@ -89,11 +103,7 @@ public class PlayerService
 	// 	Console.WriteLine(player is null ? "No player found." : player.ToString());
 	// }
 
-	public async Task<Player?> GetPlayerById(int playerId, CancellationToken cancellationToken)
-	{
-		var player = await _playerRepository.FindPlayerAsync(playerId, cancellationToken);
-		return player;
-	}
+	
 
 	// public void DeletePlayer()
 	// {
