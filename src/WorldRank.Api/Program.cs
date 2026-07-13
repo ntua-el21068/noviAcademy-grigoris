@@ -1,0 +1,48 @@
+using System.Text.Json.Serialization;
+using Microsoft.Extensions.DependencyInjection;
+using NLog.Extensions.Logging;
+using WorldRank.Application.Services;
+using WorldRank.Application.Strategies;
+using WorldRank.Infrastructure;
+
+var builder = WebApplication.CreateBuilder(args);
+
+// Logging via NLog
+builder.Logging.ClearProviders();
+builder.Logging.AddNLog("nlog.config");
+
+builder.Services.AddMemoryCache();
+
+// Register the DB context + DB-backed repositories
+builder.Services.AddInfrastructure(useDatabase: true, connectionString: "Data Source=worldrank.db");
+
+// Register the application services 
+builder.Services.AddScoped<PlayerService>();
+builder.Services.AddScoped<WalletService>();
+
+// Funds strategies (WalletService needs IEnumerable<IFundsStrategy>)
+builder.Services.AddSingleton<IFundsStrategy, AddFundsStrategy>();
+builder.Services.AddSingleton<IFundsStrategy, SubtractFundsStrategy>();
+builder.Services.AddSingleton<IFundsStrategy, ForceSubtractFundsStrategy>();
+
+// Controllers, with enums serialized as strings (e.g. Currency).
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+
+// Swagger / OpenAPI
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+var app = builder.Build();
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+    app.MapGet("/", () => Results.Redirect("/swagger"));
+}
+
+app.MapControllers();
+
+app.Run();
