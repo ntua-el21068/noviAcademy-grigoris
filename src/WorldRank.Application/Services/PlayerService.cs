@@ -1,109 +1,114 @@
 using WorldRank.Application.Interfaces;
 using WorldRank.Domain.Entities;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace WorldRank.Application.Services;
 
 public class PlayerService
 {
 	private readonly IPlayerRepository _playerRepository;
+	private IMemoryCache _cache;
 
-	public PlayerService(IPlayerRepository playerRepository)
+	public PlayerService(IPlayerRepository playerRepository, IMemoryCache cache)
 	{
 		_playerRepository = playerRepository;
+		_cache = cache;
 	}
 
-	public void AddPlayer()
+	public async Task<IEnumerable<Player>> GetAllPlayers(CancellationToken cancellationToken)
 	{
-		Console.Write("Name: ");
-		var name = Console.ReadLine();
-		if (string.IsNullOrWhiteSpace(name))
+		if(_cache.TryGetValue("AllPlayersKey", out IReadOnlyList<Player>? cached) && cached is not null)
 		{
-			Console.WriteLine("Name cannot be empty.");
-			return;
+			return cached;
 		}
+		var players = await _playerRepository.GetAllPlayersAsync(cancellationToken);
 
-		Console.Write("Score: ");
-		var scoreInput = Console.ReadLine();
-		if (!int.TryParse(scoreInput, out var score))
-		{
-			Console.WriteLine("Score must be a whole number.");
-			return;
-		}
+		_cache.Set("AllPlayersKey", players, TimeSpan.FromSeconds(60));
+		return players;
+	}
 
-		var player = new Player(GeneratePlayerId(), name);
+	public async Task<Player> AddPlayer(string name, int score, CancellationToken cancellationToken)
+	{
+		var player = new Player(await(GeneratePlayerIdAsync(cancellationToken)), name);
 		player.AddScore(score);
-		_playerRepository.AddPlayer(player);
-		Console.WriteLine("Player added successfully.");
+		await _playerRepository.AddPlayerAsync(player, cancellationToken);
+		return player;
 	}
 
-	public void ListPlayers()
+	//public void ListPlayers()
+	//{
+	//	var all = _playerRepository.GetAllPlayers().ToList();
+
+	//	if (all.Count == 0)
+	//	{
+	//		Console.WriteLine("No players registered.");
+	//		return;
+	//	}
+
+//		foreach (var player in all)
+//			Console.WriteLine(player);
+//	}
+
+	// public void ListPlayersByScore()
+	// {
+	// 	var groups = _playerRepository.GroupPlayersByScore().ToList();
+
+	// 	if (groups.Count == 0)
+	// 	{
+	// 		Console.WriteLine("No players registered.");
+	// 		return;
+	// 	}
+
+	// 	foreach (var group in groups)
+	// 	{
+	// 		Console.WriteLine($"Score {group.Key}:");
+	// 		foreach (var player in group)
+	// 			Console.WriteLine($"  {player}");
+	// 	}
+	// }
+
+	// public void FindPlayerByName()
+	// {
+	// 	Console.Write("Search by name: ");
+	// 	var term = Console.ReadLine() ?? string.Empty;
+
+	// 	var player = _playerRepository.GetAllPlayers()
+	// 		.FirstOrDefault(p => p.Name.Equals(term, StringComparison.OrdinalIgnoreCase));
+
+	// 	Console.WriteLine(player is null ? "No player found." : player.ToString());
+	// }
+
+	// public void FindPlayerById()
+	// {
+	// 	var playerId = Prompts.PromptPlayerId();
+	// 	if (playerId is null)
+	// 		return;
+
+	// 	var player = _playerRepository.FindPlayer(playerId.Value);
+
+	// 	Console.WriteLine(player is null ? "No player found." : player.ToString());
+	// }
+
+	public async Task<Player?> GetPlayerById(int playerId, CancellationToken cancellationToken)
 	{
-		var all = _playerRepository.GetAllPlayers().ToList();
-
-		if (all.Count == 0)
-		{
-			Console.WriteLine("No players registered.");
-			return;
-		}
-
-		foreach (var player in all)
-			Console.WriteLine(player);
+		var player = await _playerRepository.FindPlayerAsync(playerId, cancellationToken);
+		return player;
 	}
 
-	public void ListPlayersByScore()
-	{
-		var groups = _playerRepository.GroupPlayersByScore().ToList();
+	// public void DeletePlayer()
+	// {
+	// 	var playerId = Prompts.PromptPlayerId();
+	// 	if (playerId is null)
+	// 		return;
 
-		if (groups.Count == 0)
-		{
-			Console.WriteLine("No players registered.");
-			return;
-		}
-
-		foreach (var group in groups)
-		{
-			Console.WriteLine($"Score {group.Key}:");
-			foreach (var player in group)
-				Console.WriteLine($"  {player}");
-		}
-	}
-
-	public void FindPlayerByName()
-	{
-		Console.Write("Search by name: ");
-		var term = Console.ReadLine() ?? string.Empty;
-
-		var player = _playerRepository.GetAllPlayers()
-			.FirstOrDefault(p => p.Name.Equals(term, StringComparison.OrdinalIgnoreCase));
-
-		Console.WriteLine(player is null ? "No player found." : player.ToString());
-	}
-
-	public void FindPlayerById()
-	{
-		var playerId = Prompts.PromptPlayerId();
-		if (playerId is null)
-			return;
-
-		var player = _playerRepository.FindPlayer(playerId.Value);
-
-		Console.WriteLine(player is null ? "No player found." : player.ToString());
-	}
-
-	public void DeletePlayer()
-	{
-		var playerId = Prompts.PromptPlayerId();
-		if (playerId is null)
-			return;
-
-		_playerRepository.DeletePlayer(playerId.Value);
-		Console.WriteLine("Player deleted (if it existed).");
-	}
+	// 	_playerRepository.DeletePlayer(playerId.Value);
+	// 	Console.WriteLine("Player deleted (if it existed).");
+	// }
 
 	// Generates a random, unique player id (avoids collisions with already-registered players).
-	private int GeneratePlayerId()
+	private async Task<int> GeneratePlayerIdAsync(CancellationToken cancellationToken)
 	{
-		var existingIds = _playerRepository.GetAllPlayers().Select(p => p.Id).ToHashSet();
+		var existingIds = (await _playerRepository.GetAllPlayersAsync(cancellationToken)).Select(p => p.Id).ToHashSet();
 
 		int id;
 		do
