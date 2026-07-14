@@ -12,9 +12,11 @@ public interface IWalletRepository
 
 	Task<Wallet> GetWalletAsync(int playerId, Currency currency, CancellationToken cancellationToken);
 
+	Task  SaveChangesAsync(CancellationToken cancellationToken);
+
 	//Task UpdateBalanceAsync(int playerId, Currency currency, decimal newBalance, CancellationToken cancellationToken);
 
-	Task DepositAsync(int playerId, Currency currency, decimal amount, CancellationToken cancellationToken);
+	//Task DepositAsync(int playerId, Currency currency, decimal amount, CancellationToken cancellationToken);
 
 	//Task WithdrawAsync(int playerId, Currency currency, decimal amount, CancellationToken cancellationToken);
 
