@@ -4,6 +4,8 @@ using NLog.Extensions.Logging;
 using WorldRank.Application.Services;
 using WorldRank.Application.Strategies;
 using WorldRank.Infrastructure;
+using WorldRank.Infrastructure.Caching;
+using WorldRank.Application.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,9 +14,10 @@ builder.Logging.ClearProviders();
 builder.Logging.AddNLog("nlog.config");
 
 builder.Services.AddMemoryCache();
+builder.Services.AddSingleton<ICache, MemoryCacheStore>();
 
 // Register the DB context + DB-backed repositories
-builder.Services.AddInfrastructure(useDatabase: true, connectionString: "Data Source=worldrank.db");
+builder.Services.AddInfrastructure(connectionString: "Data Source=worldrank.db");
 
 // Register the application services 
 builder.Services.AddScoped<PlayerService>();

@@ -1,15 +1,14 @@
 using WorldRank.Application.Interfaces;
 using WorldRank.Domain.Entities;
-using Microsoft.Extensions.Caching.Memory;
 
 namespace WorldRank.Application.Services;
 
 public class PlayerService
 {
 	private readonly IPlayerRepository _playerRepository;
-	private IMemoryCache _cache;
+	private ICache _cache;
 
-	public PlayerService(IPlayerRepository playerRepository, IMemoryCache cache)
+	public PlayerService(IPlayerRepository playerRepository, ICache cache)
 	{
 		_playerRepository = playerRepository;
 		_cache = cache;
@@ -17,7 +16,7 @@ public class PlayerService
 
 	public async Task<IEnumerable<Player>> GetAllPlayers(CancellationToken cancellationToken)
 	{
-		if(_cache.TryGetValue("AllPlayersKey", out IReadOnlyList<Player>? cached) && cached is not null)
+		if(_cache.TryGet("AllPlayersKey", out IEnumerable<Player>? cached) && cached is not null)
 		{
 			return cached;
 		}
@@ -30,7 +29,7 @@ public class PlayerService
 	public async Task<Player?> GetPlayerById(int playerId, CancellationToken cancellationToken)
 	{
 		var cacheKey = $"Player_{playerId}";
-		if(_cache.TryGetValue(cacheKey, out Player? cached) && cached is not null)
+		if(_cache.TryGet(cacheKey, out Player? cached) && cached is not null)
 		{
 			return cached;
 		}
@@ -46,6 +45,7 @@ public class PlayerService
 		var player = new Player(await(GeneratePlayerIdAsync(cancellationToken)), name);
 		player.AddScore(score);
 		await _playerRepository.AddPlayerAsync(player, cancellationToken);
+		_cache.Remove("AllPlayersKey");
 		return player;
 	}
 
