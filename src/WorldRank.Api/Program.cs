@@ -5,7 +5,7 @@ using WorldRank.Application.Services;
 using WorldRank.Application.Strategies;
 using WorldRank.Infrastructure;
 using WorldRank.Infrastructure.Caching;
-using WorldRank.Application.Interfaces;
+using WorldRank.Application.Caching;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 
@@ -29,8 +29,8 @@ builder.Services.AddSingleton<ICache, MemoryCacheStore>();
 builder.Services.AddInfrastructure(connectionString: "Data Source=worldrank.db");
 
 // Register the application services 
-builder.Services.AddScoped<PlayerService>();
-builder.Services.AddScoped<WalletService>();
+//builder.Services.AddScoped<PlayerService>();
+//builder.Services.AddScoped<WalletService>();
 
 // Funds strategies (WalletService needs IEnumerable<IFundsStrategy>)
 builder.Services.AddSingleton<IFundsStrategy, AddFundsStrategy>();

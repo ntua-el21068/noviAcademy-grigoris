@@ -1,5 +1,5 @@
 using Microsoft.Extensions.Caching.Memory;
-using WorldRank.Application.Interfaces;
+using WorldRank.Application.Caching;
 
 namespace WorldRank.Infrastructure.Caching;
 

@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using WorldRank.Application.Infrastructure;
-using WorldRank.Application.Interfaces;
+using WorldRank.Application.Caching;
 using WorldRank.Infrastructure.Persistence.Commands.Players;
 using WorldRank.Infrastructure.Persistence.Commands.Wallets;
 using WorldRank.Infrastructure.Persistence.Queries;

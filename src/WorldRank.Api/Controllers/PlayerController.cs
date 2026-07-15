@@ -6,7 +6,7 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using WorldRank.Api.DTOs;
 using WorldRank.Application.Commands.Players;
-using WorldRank.Application.Interfaces;
+using WorldRank.Application.Caching;
 using WorldRank.Application.Queries.Players;
 using WorldRank.Application.Services;
 using WorldRank.Domain.Entities;

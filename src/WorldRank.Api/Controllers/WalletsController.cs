@@ -6,7 +6,7 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using WorldRank.Api.DTOs;
 using WorldRank.Application.Commands.Wallets;
-using WorldRank.Application.Interfaces;
+using WorldRank.Application.Caching;
 using WorldRank.Application.Queries.Wallets;
 using WorldRank.Application.Services;
 using WorldRank.Domain.Entities;
@@ -18,12 +18,12 @@ namespace WorldRank.Api.Controllers
     [Route("[controller]")]
     public class WalletsController : ControllerBase
     {
-        private readonly WalletService _walletService;
+        //private readonly WalletService _walletService;
         private readonly IMediator _mediator;
 
-        public WalletsController(WalletService walletService, IMediator mediator)
+        public WalletsController( IMediator mediator)
         {
-            _walletService = walletService;
+            //_walletService = walletService;
             _mediator = mediator;
         }
 

@@ -1,6 +1,6 @@
 //by Claude
 
-namespace WorldRank.Application.Interfaces;
+namespace WorldRank.Application.Caching;
 
 public interface ICache
 {

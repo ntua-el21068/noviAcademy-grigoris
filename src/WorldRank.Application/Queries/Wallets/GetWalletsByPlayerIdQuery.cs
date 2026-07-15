@@ -2,10 +2,14 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using WorldRank.Application.Caching;
 using WorldRank.Domain.Entities;
 
 namespace WorldRank.Application.Queries.Wallets
 {
-    public record GetWalletsByPlayerIdQuery(int playerId) : IRequest<List<Wallet>>;
-    
+    public record GetWalletsByPlayerIdQuery(int playerId) : IRequest<List<Wallet>>, ICacheableQuery
+    {
+        public string CacheKey => $"WalletsByPlayer_{playerId}";
+    }
+
 }

@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using WorldRank.Application.Interfaces;
+using WorldRank.Application.Repositories;
 using WorldRank.Infrastructure.Persistence;
 using WorldRank.Infrastructure.Repositories;
 
