@@ -2,9 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using WorldRank.Api.DTOs;
-using WorldRank.Application.Interfaces;
+using WorldRank.Application.Commands.Players;
+using WorldRank.Application.Caching;
+using WorldRank.Application.Queries.Players;
 using WorldRank.Application.Services;
 using WorldRank.Domain.Entities;
 
@@ -15,11 +18,13 @@ namespace WorldRank.Api.Controllers
     [Route("[controller]")]
     public class PlayersController : ControllerBase
     {
-        private readonly PlayerService _playerService;
+        //private readonly PlayerService _playerService;
+        private readonly IMediator _mediator;
 
-        public PlayersController(PlayerService playerService)
+        public PlayersController( IMediator mediator)
         {
-            _playerService = playerService;
+            //_playerService = playerService;
+            _mediator = mediator;
         }
 
 
@@ -27,7 +32,7 @@ namespace WorldRank.Api.Controllers
         public async Task< IActionResult> GetAll(CancellationToken cancellationToken)
         {
             try{
-            var players = await _playerService.GetAllPlayers(cancellationToken);
+                var players = await _mediator.Send(new GetAllPlayersQuery(), cancellationToken);
             return Ok(players);
             }
             catch(Exception ex)
@@ -42,7 +47,7 @@ namespace WorldRank.Api.Controllers
         {
             try
             {
-                var result = await _playerService.GetPlayerById(playerId, cancellationToken);
+                var result = await _mediator.Send(new GetPlayerByIdQuery(playerId), cancellationToken);
                 if(result==null) return NotFound();
 
                 return Ok(result);
@@ -56,8 +61,8 @@ namespace WorldRank.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> AddPlayer(CreatePlayerRequest request, CancellationToken cancellationToken)
         {
-            var player = await _playerService.AddPlayer(request.Name, request.Score, cancellationToken);
-            return CreatedAtAction(nameof(GetById), new {playerId = player.Id}, player);
+            var id = await _mediator.Send(new CreatePlayerCommand(request.Name, request.Score), cancellationToken);
+            return CreatedAtAction(nameof(GetById), new { playerId = id }, new {id});
         }
 
 

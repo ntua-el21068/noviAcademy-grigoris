@@ -8,7 +8,7 @@ public class WorldRankDbContextFactory : IDesignTimeDbContextFactory<WorldRankDb
     public WorldRankDbContext CreateDbContext(string[] args)
     {
         var optionsBuilder = new DbContextOptionsBuilder<WorldRankDbContext>();
-        optionsBuilder.UseSqlite("Data Source=worldrank.db");
+        optionsBuilder.UseSqlServer("Server=localhost;Database=WorldRank;Trusted_Connection=True;TrustServerCertificate=True;");
         return new WorldRankDbContext(optionsBuilder.Options);
     }
 }

@@ -1,9 +1,10 @@
 using Microsoft.Extensions.Logging;
-using WorldRank.Application.Interfaces;
+using WorldRank.Application.Caching;
 using WorldRank.Application.Strategies;
 using WorldRank.Domain.Entities;
 using WorldRank.Domain.Exceptions;
 using WorldRank.Domain.Enums;
+using WorldRank.Application.Repositories;
 
 
 namespace WorldRank.Application.Services;

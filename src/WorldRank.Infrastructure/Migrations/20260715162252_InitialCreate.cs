@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace WorldRank.Infrastructure.Persistence.Migrations
+namespace WorldRank.Infrastructure.Migrations
 {
     /// <inheritdoc />
     public partial class InitialCreate : Migration
@@ -14,9 +14,9 @@ namespace WorldRank.Infrastructure.Persistence.Migrations
                 name: "Players",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false),
-                    Name = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
-                    Score = table.Column<int>(type: "INTEGER", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Score = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -27,11 +27,11 @@ namespace WorldRank.Infrastructure.Persistence.Migrations
                 name: "Wallets",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false),
-                    Currency = table.Column<string>(type: "TEXT", nullable: false),
-                    PlayerId = table.Column<int>(type: "INTEGER", nullable: false),
-                    Balance = table.Column<decimal>(type: "TEXT", nullable: false),
-                    IsBlocked = table.Column<bool>(type: "INTEGER", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false),
+                    Currency = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    PlayerId = table.Column<int>(type: "int", nullable: false),
+                    Balance = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    IsBlocked = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {

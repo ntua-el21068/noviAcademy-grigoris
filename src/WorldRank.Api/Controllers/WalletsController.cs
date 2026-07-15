@@ -2,9 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using WorldRank.Api.DTOs;
-using WorldRank.Application.Interfaces;
+using WorldRank.Application.Commands.Wallets;
+using WorldRank.Application.Caching;
+using WorldRank.Application.Queries.Wallets;
 using WorldRank.Application.Services;
 using WorldRank.Domain.Entities;
 using WorldRank.Domain.Exceptions;
@@ -15,11 +18,13 @@ namespace WorldRank.Api.Controllers
     [Route("[controller]")]
     public class WalletsController : ControllerBase
     {
-        private readonly WalletService _walletService;
+        //private readonly WalletService _walletService;
+        private readonly IMediator _mediator;
 
-        public WalletsController(WalletService walletService)
+        public WalletsController( IMediator mediator)
         {
-            _walletService = walletService;
+            //_walletService = walletService;
+            _mediator = mediator;
         }
 
          [HttpGet("{playerId:int}")]
@@ -27,29 +32,36 @@ namespace WorldRank.Api.Controllers
         {
             try
             {
-                var result = await _walletService.GetWalletsOfPlayer(playerId, cancellationToken);
-                if(result==null) return NotFound();
+                var result = await _mediator.Send(new GetWalletsByPlayerIdQuery(playerId), cancellationToken);
 
                 return Ok(result);
             }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
+            catch (PlayerNotFoundException ex) { return StatusCode(404, ex.Message); }
+            catch (Exception ex) { return StatusCode(500, ex.Message); }
+            
+
         }
 
         [HttpPost]
         public async Task<IActionResult> AddWallet( CreateWalletRequest request, CancellationToken cancellationToken)
         {
-            var wallet = await _walletService.AddWalletToPlayer(request.playerId, request.currency, request.balance, cancellationToken);
-            return CreatedAtAction(nameof(GetPlayerWallets), new {playerId = wallet.PlayerId}, wallet);
+            try
+            {
+                var id = await _mediator.Send(new CreateWalletCommand(request.playerId, request.currency, request.balance), cancellationToken);
+                return Created($"/wallets/{id}", new { id });
+            }
+            catch (PlayerNotFoundException ex) { return StatusCode(404, ex.Message); }
+            catch (DuplicateWalletException ex) { return StatusCode(409, ex.Message); }
+            catch (WalletException ex) { return StatusCode(400, ex.Message); }
+            catch (Exception ex) { return StatusCode(500, ex.Message); }
         }
 
         [HttpPost("{playerId:int}/deposit")]
         public async Task<IActionResult> Deposit(int playerId, CreateDepositRequest request, CancellationToken cancellationToken)
         {
+            decimal newBalance;
             try{
-            await _walletService.DepositToWalletAsync(playerId, request.amount, request.currency, cancellationToken);
+               newBalance = await _mediator.Send(new DepositToWalletCommand(playerId, request.amount, request.currency), cancellationToken);
             }
             catch (WalletNotFoundException ex)
             {
@@ -67,7 +79,7 @@ namespace WorldRank.Api.Controllers
             {
                 return StatusCode(500, ex.Message);
             }
-            return Ok();
+            return Ok(new { balance = newBalance }); ;
         }
 
     }
