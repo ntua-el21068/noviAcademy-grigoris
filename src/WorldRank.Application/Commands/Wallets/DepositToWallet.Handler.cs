@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using WorldRank.Application.Caching;
 using WorldRank.Application.Infrastructure;
 using WorldRank.Domain.Exceptions;
 
@@ -11,14 +12,17 @@ namespace WorldRank.Application.Commands.Wallets
     {
         private readonly IDepositToWalletPersistence _depositWalletPersistence;
         private readonly IGetWalletsByPlayerIdPersistence _getWalletsByPlayerIdPersistence;
+        private readonly ICache _cache;
 
         public DepositToWalletHandler(
             IDepositToWalletPersistence depositWalletPersistence, 
-            IGetWalletsByPlayerIdPersistence getWalletsByPlayerIdPersistence
+            IGetWalletsByPlayerIdPersistence getWalletsByPlayerIdPersistence,
+            ICache cache
             )
         {
             _depositWalletPersistence = depositWalletPersistence;
             _getWalletsByPlayerIdPersistence = getWalletsByPlayerIdPersistence;
+            _cache = cache;
         }
         public async Task<decimal> Handle(DepositToWalletCommand request, CancellationToken cancellationToken)
         {
@@ -30,6 +34,7 @@ namespace WorldRank.Application.Commands.Wallets
                 throw new WalletNotFoundException(request.playerId, request.currency);
 
                 decimal balance = await _depositWalletPersistence.Persist(request.playerId, request.amount, request.currency, cancellationToken);
+            _cache.Remove($"WalletsByPlayerId_{request.playerId}");
             return balance;
 
         }
