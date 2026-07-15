@@ -38,7 +38,7 @@ namespace WorldRank.Application.Commands.Wallets
                 throw new PlayerNotFoundException(command.playerId);
             var wallet = new Wallet(0, command.playerId, command.currency, command.balance);
             var id = await _createWalletPersistence.Persist(wallet, cancellationToken);
-            _cache.Remove($"WalletsByPlayerId_{command.playerId}");
+            _cache.Remove($"WalletsByPlayer_{command.playerId}");
             return id;
         }
     }

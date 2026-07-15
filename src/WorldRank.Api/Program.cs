@@ -26,7 +26,7 @@ builder.Services.AddMemoryCache();
 builder.Services.AddSingleton<ICache, MemoryCacheStore>();
 
 // Register the DB context + DB-backed repositories
-builder.Services.AddInfrastructure(connectionString: "Data Source=worldrank.db");
+builder.Services.AddInfrastructure(connectionString: "Server=localhost;Database=WorldRank;Trusted_Connection=True;TrustServerCertificate=True;");
 
 // Register the application services 
 //builder.Services.AddScoped<PlayerService>();

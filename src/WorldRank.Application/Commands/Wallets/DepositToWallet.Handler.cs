@@ -34,7 +34,7 @@ namespace WorldRank.Application.Commands.Wallets
                 throw new WalletNotFoundException(request.playerId, request.currency);
 
                 decimal balance = await _depositWalletPersistence.Persist(request.playerId, request.amount, request.currency, cancellationToken);
-            _cache.Remove($"WalletsByPlayerId_{request.playerId}");
+            _cache.Remove($"WalletsByPlayer_{request.playerId}");
             return balance;
 
         }

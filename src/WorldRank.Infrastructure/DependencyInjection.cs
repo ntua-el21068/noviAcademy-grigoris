@@ -11,8 +11,8 @@ public static class DependencyInjection
    public static IServiceCollection AddInfrastructure(this IServiceCollection services, string? connectionString = null)
         {
             services.AddDbContext<WorldRankDbContext>(
-                options => options.UseSqlite(connectionString ?? "Data Source=worldrank.db"),
-                ServiceLifetime.Singleton);
+                options => options.UseSqlServer(connectionString ?? "Server=localhost;Database=WorldRank;Trusted_Connection=True;TrustServerCertificate=True;"),
+                ServiceLifetime.Scoped);
 
             services.AddScoped<IPlayerRepository, DBPlayerRepository>();
             services.AddScoped<IWalletRepository, DBWalletRepository>();
