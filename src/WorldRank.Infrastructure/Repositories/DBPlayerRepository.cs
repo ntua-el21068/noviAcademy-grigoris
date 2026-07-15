@@ -1,8 +1,8 @@
 using Microsoft.Extensions.Logging;
-using WorldRank.Application.Interfaces;
 using WorldRank.Domain.Entities;
 using WorldRank.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+using WorldRank.Application.Repositories;
 
 namespace WorldRank.Infrastructure.Repositories;
 

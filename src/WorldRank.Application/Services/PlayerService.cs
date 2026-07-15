@@ -1,4 +1,5 @@
-using WorldRank.Application.Interfaces;
+using WorldRank.Application.Caching;
+using WorldRank.Application.Repositories;
 using WorldRank.Domain.Entities;
 
 namespace WorldRank.Application.Services;
