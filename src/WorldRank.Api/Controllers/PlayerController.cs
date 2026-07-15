@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using WorldRank.Api.DTOs;
 using WorldRank.Application.Commands.Players;
 using WorldRank.Application.Interfaces;
+using WorldRank.Application.Queries.Players;
 using WorldRank.Application.Services;
 using WorldRank.Domain.Entities;
 
@@ -17,12 +18,12 @@ namespace WorldRank.Api.Controllers
     [Route("[controller]")]
     public class PlayersController : ControllerBase
     {
-        private readonly PlayerService _playerService;
+        //private readonly PlayerService _playerService;
         private readonly IMediator _mediator;
 
-        public PlayersController(PlayerService playerService, IMediator mediator)
+        public PlayersController( IMediator mediator)
         {
-            _playerService = playerService;
+            //_playerService = playerService;
             _mediator = mediator;
         }
 
@@ -31,7 +32,7 @@ namespace WorldRank.Api.Controllers
         public async Task< IActionResult> GetAll(CancellationToken cancellationToken)
         {
             try{
-            var players = await _playerService.GetAllPlayers(cancellationToken);
+                var players = await _mediator.Send(new GetAllPlayersQuery(), cancellationToken);
             return Ok(players);
             }
             catch(Exception ex)
@@ -46,7 +47,7 @@ namespace WorldRank.Api.Controllers
         {
             try
             {
-                var result = await _playerService.GetPlayerById(playerId, cancellationToken);
+                var result = await _mediator.Send(new GetPlayerByIdQuery(playerId), cancellationToken);
                 if(result==null) return NotFound();
 
                 return Ok(result);
