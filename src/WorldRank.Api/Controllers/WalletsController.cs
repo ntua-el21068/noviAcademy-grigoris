@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using WorldRank.Api.DTOs;
 using WorldRank.Application.Commands.Wallets;
 using WorldRank.Application.Interfaces;
+using WorldRank.Application.Queries.Wallets;
 using WorldRank.Application.Services;
 using WorldRank.Domain.Entities;
 using WorldRank.Domain.Exceptions;
@@ -31,15 +32,14 @@ namespace WorldRank.Api.Controllers
         {
             try
             {
-                var result = await _walletService.GetWalletsOfPlayer(playerId, cancellationToken);
-                if(result==null) return NotFound();
+                var result = await _mediator.Send(new GetWalletsByPlayerIdQuery(playerId), cancellationToken);
 
                 return Ok(result);
             }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
+            catch (PlayerNotFoundException ex) { return StatusCode(404, ex.Message); }
+            catch (Exception ex) { return StatusCode(500, ex.Message); }
+            
+
         }
 
         [HttpPost]

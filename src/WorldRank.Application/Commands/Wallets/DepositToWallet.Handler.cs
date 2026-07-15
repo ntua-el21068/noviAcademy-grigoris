@@ -10,18 +10,26 @@ namespace WorldRank.Application.Commands.Wallets
     public class DepositToWalletHandler : IRequestHandler<DepositToWalletCommand, decimal>
     {
         private readonly IDepositToWalletPersistence _depositWalletPersistence;
-        //private readonly IGetWalletsByPlayerIdPersistence _getWalletsByPlayerIdPersistence;
+        private readonly IGetWalletsByPlayerIdPersistence _getWalletsByPlayerIdPersistence;
 
-        public DepositToWalletHandler(IDepositToWalletPersistence depositWalletPersistence)
+        public DepositToWalletHandler(
+            IDepositToWalletPersistence depositWalletPersistence, 
+            IGetWalletsByPlayerIdPersistence getWalletsByPlayerIdPersistence
+            )
         {
             _depositWalletPersistence = depositWalletPersistence;
+            _getWalletsByPlayerIdPersistence = getWalletsByPlayerIdPersistence;
         }
         public async Task<decimal> Handle(DepositToWalletCommand request, CancellationToken cancellationToken)
         {
             if (request.amount <= 0)
                 throw new InvalidAmountException(request.amount);
-            //Wallet existence validation logic
-            decimal balance = await _depositWalletPersistence.Persist(request.playerId, request.amount, request.currency, cancellationToken);
+            var wallets = await _getWalletsByPlayerIdPersistence.Get(request.playerId, cancellationToken);
+            bool exist = wallets.Any(w => w.Currency == request.currency);
+            if (!exist)
+                throw new WalletNotFoundException(request.playerId, request.currency);
+
+                decimal balance = await _depositWalletPersistence.Persist(request.playerId, request.amount, request.currency, cancellationToken);
             return balance;
 
         }

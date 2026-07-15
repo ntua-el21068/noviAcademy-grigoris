@@ -8,6 +8,7 @@ using WorldRank.Infrastructure.Persistence.Commands.Players;
 using WorldRank.Infrastructure.Persistence.Commands.Wallets;
 using WorldRank.Infrastructure.Persistence.Queries;
 using WorldRank.Infrastructure.Persistence.Queries.Players;
+using WorldRank.Infrastructure.Persistence.Queries.Wallets;
 using WorldRank.Infrastructure.Repositories;
 
 namespace WorldRank.Infrastructure
@@ -36,6 +37,10 @@ namespace WorldRank.Infrastructure
 
             builder.RegisterType<DepositToWalletPersistence>()
             .As<IDepositToWalletPersistence>()
+            .InstancePerLifetimeScope();
+
+            builder.RegisterType<GetWalletsByPlayerIdPersistence>()
+            .As<IGetWalletsByPlayerIdPersistence>()
             .InstancePerLifetimeScope();
         }
     }
