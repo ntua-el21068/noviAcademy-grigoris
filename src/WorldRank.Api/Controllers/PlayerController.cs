@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using WorldRank.Api.DTOs;
+using WorldRank.Application.Commands.Players;
 using WorldRank.Application.Interfaces;
 using WorldRank.Application.Services;
 using WorldRank.Domain.Entities;
@@ -16,10 +18,12 @@ namespace WorldRank.Api.Controllers
     public class PlayersController : ControllerBase
     {
         private readonly PlayerService _playerService;
+        private readonly IMediator _mediator;
 
-        public PlayersController(PlayerService playerService)
+        public PlayersController(PlayerService playerService, IMediator mediator)
         {
             _playerService = playerService;
+            _mediator = mediator;
         }
 
 
@@ -56,8 +60,8 @@ namespace WorldRank.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> AddPlayer(CreatePlayerRequest request, CancellationToken cancellationToken)
         {
-            var player = await _playerService.AddPlayer(request.Name, request.Score, cancellationToken);
-            return CreatedAtAction(nameof(GetById), new {playerId = player.Id}, player);
+            var id = await _mediator.Send(new CreatePlayerCommand(request.Name, request.Score), cancellationToken);
+            return CreatedAtAction(nameof(GetById), new { playerId = id }, new {id});
         }
 
 
