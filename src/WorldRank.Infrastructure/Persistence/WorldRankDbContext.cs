@@ -7,6 +7,7 @@ public class WorldRankDbContext : DbContext
 {
     public DbSet<Player> Players => Set<Player>();
     public DbSet<Wallet> Wallets => Set<Wallet>();
+    public DbSet<CurrencyRate> CurrencyRates => Set<CurrencyRate>();
 
     public WorldRankDbContext(DbContextOptions<WorldRankDbContext> options) : base(options)
     {

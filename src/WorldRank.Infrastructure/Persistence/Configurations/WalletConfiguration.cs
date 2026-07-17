@@ -12,5 +12,6 @@ public class WalletConfiguration : IEntityTypeConfiguration<Wallet>
         builder.Property(w => w.Id).ValueGeneratedNever();
         builder.Property(w => w.Currency).HasConversion<string>();
         builder.HasIndex(w => new { w.PlayerId, w.Currency }).IsUnique();
+        builder.Property(w => w.Balance).HasColumnType("decimal(18,2)");
     }
 }

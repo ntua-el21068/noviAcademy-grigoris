@@ -1,13 +1,17 @@
-using System.Text.Json.Serialization;
-using Microsoft.Extensions.DependencyInjection;
-using NLog.Extensions.Logging;
-using WorldRank.Application.Services;
-using WorldRank.Application.Strategies;
-using WorldRank.Infrastructure;
-using WorldRank.Infrastructure.Caching;
-using WorldRank.Application.Caching;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
+using NLog.Extensions.Logging;
+using Quartz;
+using System.Text.Json.Serialization;
+using WorldRank.Application.Caching;
+using WorldRank.Application.HttpClients;
+using WorldRank.Application.Jobs;
+using WorldRank.Application.Services;
+using WorldRank.Application.Strategies;
+using WorldRank.Gateway;
+using WorldRank.Infrastructure;
+using WorldRank.Infrastructure.Caching;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,9 +32,11 @@ builder.Services.AddSingleton<ICache, MemoryCacheStore>();
 // Register the DB context + DB-backed repositories
 builder.Services.AddInfrastructure(connectionString: "Server=localhost;Database=WorldRank;Trusted_Connection=True;TrustServerCertificate=True;");
 
-// Register the application services 
-//builder.Services.AddScoped<PlayerService>();
-//builder.Services.AddScoped<WalletService>();
+//Register EcbHttpClient 
+builder.Services.AddHttpClient<IEcbHttpClient, EcbHttpClient>(client =>
+{
+    client.BaseAddress = new Uri("https://www.ecb.europa.eu/");
+});
 
 // Funds strategies (WalletService needs IEnumerable<IFundsStrategy>)
 builder.Services.AddSingleton<IFundsStrategy, AddFundsStrategy>();
@@ -45,6 +51,22 @@ builder.Services.AddControllers()
 // Swagger / OpenAPI
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+//CurrencyRate scheduled data fetch (everyday at 16:00)
+builder.Services.AddQuartz(q =>
+{
+    var jobKey = new JobKey("DataFetchJob");
+
+    q.AddJob<DataFetchJob>(opts => opts.WithIdentity(jobKey));
+
+    q.AddTrigger(opts => opts
+        .ForJob(jobKey)
+        .WithIdentity("DataFetchJob-trigger")
+        //.WithCronSchedule("0 0 16 * * ?"));
+        .WithSimpleSchedule(s => s.WithIntervalInSeconds(30).RepeatForever()));
+});
+
+builder.Services.AddQuartzHostedService(opts => opts.WaitForJobsToComplete = true);
 
 var app = builder.Build();
 
