@@ -2,8 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using WorldRank.Application.Infrastructure;
 using WorldRank.Application.Caching;
+using WorldRank.Application.Infrastructure;
+using WorldRank.Infrastructure.Persistence.Commands.CurrencyRates;
 using WorldRank.Infrastructure.Persistence.Commands.Players;
 using WorldRank.Infrastructure.Persistence.Commands.Wallets;
 using WorldRank.Infrastructure.Persistence.Queries;
@@ -41,6 +42,10 @@ namespace WorldRank.Infrastructure
 
             builder.RegisterType<GetWalletsByPlayerIdPersistence>()
             .As<IGetWalletsByPlayerIdPersistence>()
+            .InstancePerLifetimeScope();
+
+            builder.RegisterType<SaveCurrencyRatesPersistence>()
+            .As<ISaveCurrencyRatesPersistence>()
             .InstancePerLifetimeScope();
         }
     }

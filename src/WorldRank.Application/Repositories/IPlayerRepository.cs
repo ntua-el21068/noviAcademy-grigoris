@@ -4,6 +4,7 @@ namespace WorldRank.Application.Repositories;
 
 public interface IPlayerRepository
 {
+	
 	Task AddPlayerAsync(Player player, CancellationToken cancellationToken);
 
 	Task<IEnumerable<Player>>  GetAllPlayersAsync(CancellationToken cancellationToken);
